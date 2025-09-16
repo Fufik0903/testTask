@@ -8,6 +8,9 @@
 import axios from 'axios';
 import { useEffect, useState } from 'react';
 import {
+  FlatList,
+  Image,
+  Platform,
   StatusBar,
   StyleSheet,
   Text,
@@ -20,34 +23,60 @@ import {
   useSafeAreaInsets,
 } from 'react-native-safe-area-context';
 import { checkPermission, Coordinates } from './permission/permission';
-import { FlatList } from 'react-native/types_generated/index';
+import { RootState, useAppDispatch } from './redux/store';
+import { allData } from './redux/listSlice';
+import { useSelector } from 'react-redux';
 
+export interface workType {
+  name: string;
+}
 function App() {
-  const [data, setData] = useState([]);
+  const dispatch = useAppDispatch();
+  const [statusBarHeight, setStatusBarHeight] = useState(0);
+  const { list, isLoading } = useSelector((state: RootState) => state.list);
   const permissionResult = async () => {
-    const { latitude, longitude }: Coordinates = await checkPermission();
-    const res = await axios.get(
-      `https://mobile.handswork.pro/api/shifts/map-list-unauthorized?latitude=${latitude}&longitude=${longitude}`,
-    );
-    setData(res.data);
-    console.log('RESULT 5', res);
+    const coords: Coordinates = await checkPermission();
+    dispatch(allData(coords));
   };
   useEffect(() => {
     permissionResult();
   }, []);
+  useEffect(() => {
+    if (Platform.OS === 'android') {
+      setStatusBarHeight(StatusBar.currentHeight || 0);
+    }
+  }, []);
   return (
     <SafeAreaProvider>
-      <FlatList
-        data={data}
-        keyExtractor={item => item.id}
-        renderItem={({ item }) => (
-          <View
-            style={{ padding: 20, borderBottomWidth: 1, borderColor: '#ccc' }}
-          >
-            <Text>{item.companyName}</Text>
+      <View style={[{ paddingTop: statusBarHeight, flex: 1 }]}>
+        {isLoading ? (
+          <View>
+            <Text>Loading</Text>
           </View>
+        ) : (
+          <FlatList
+            data={list}
+            keyExtractor={item => item.id}
+            renderItem={({ item }) => (
+              <View style={styles.listContainer}>
+                <View style={styles.listTitle}>
+                  <Text style={styles.title}>{item.companyName}</Text>
+                  <Image
+                    source={{ uri: `${item.logo}` }}
+                    width={80}
+                    height={80}
+                  />
+                </View>
+                {item.workTypes?.map((wType: workType) => (
+                  <View>
+                    <Text style={styles.desc}>{wType.name}</Text>
+                  </View>
+                ))}
+              </View>
+            )}
+          />
         )}
-      />
+      </View>
     </SafeAreaProvider>
   );
 }
@@ -55,6 +84,23 @@ function App() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+  },
+  listTitle: {
+    flex: 1,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  title: {
+    fontSize: 20,
+  },
+  desc: {
+    fontSize: 18,
+  },
+  listContainer: {
+    padding: 20,
+    borderBottomWidth: 1,
+    borderColor: '#ccc',
   },
 });
 
