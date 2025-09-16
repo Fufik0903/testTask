@@ -5,34 +5,50 @@
  * @format
  */
 
-import { NewAppScreen } from '@react-native/new-app-screen';
-import { StatusBar, StyleSheet, useColorScheme, View } from 'react-native';
+import axios from 'axios';
+import { useEffect, useState } from 'react';
+import {
+  StatusBar,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  useColorScheme,
+  View,
+} from 'react-native';
 import {
   SafeAreaProvider,
   useSafeAreaInsets,
 } from 'react-native-safe-area-context';
+import { checkPermission, Coordinates } from './permission/permission';
+import { FlatList } from 'react-native/types_generated/index';
 
 function App() {
-  const isDarkMode = useColorScheme() === 'dark';
-
+  const [data, setData] = useState([]);
+  const permissionResult = async () => {
+    const { latitude, longitude }: Coordinates = await checkPermission();
+    const res = await axios.get(
+      `https://mobile.handswork.pro/api/shifts/map-list-unauthorized?latitude=${latitude}&longitude=${longitude}`,
+    );
+    setData(res.data);
+    console.log('RESULT 5', res);
+  };
+  useEffect(() => {
+    permissionResult();
+  }, []);
   return (
     <SafeAreaProvider>
-      <StatusBar barStyle={isDarkMode ? 'light-content' : 'dark-content'} />
-      <AppContent />
-    </SafeAreaProvider>
-  );
-}
-
-function AppContent() {
-  const safeAreaInsets = useSafeAreaInsets();
-
-  return (
-    <View style={styles.container}>
-      <NewAppScreen
-        templateFileName="App.tsx"
-        safeAreaInsets={safeAreaInsets}
+      <FlatList
+        data={data}
+        keyExtractor={item => item.id}
+        renderItem={({ item }) => (
+          <View
+            style={{ padding: 20, borderBottomWidth: 1, borderColor: '#ccc' }}
+          >
+            <Text>{item.companyName}</Text>
+          </View>
+        )}
       />
-    </View>
+    </SafeAreaProvider>
   );
 }
 
