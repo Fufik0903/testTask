@@ -11,7 +11,7 @@ export const checkPermission = async (): Promise<any> => {
       return coords;
     }
     else {
-      requestPermission(permission);
+       return requestPermission(permission);
     }
 
   };
