@@ -17,7 +17,7 @@ import { Coordinates } from './interfaces';
 
 function App() {
   const dispatch = useAppDispatch();
-  const { list } = useSelector((state: RootState) => state.list);
+  const { list } = useSelector((state: RootState) => state.list) ?? [];
   const permissionResult = async () => {
     const coords: Coordinates = await checkPermission();
     dispatch(allData(coords));

@@ -56,6 +56,7 @@ export const allData = createAsyncThunk(
     try {
       const { latitude, longitude } = coords;
       const response = await getAllData(latitude, longitude);
+      console.log('RESULT', response.data.data)
       return response.data.data;
     } catch (error: unknown) {
       let errorMessage = 'Unknown error';

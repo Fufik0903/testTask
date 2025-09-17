@@ -16,7 +16,7 @@ export const checkPermission = async (): Promise<any> => {
 
   };
 
-export  const getCurrentLocation = async (): Promise<any> => {
+export const getCurrentLocation = async (): Promise<any> => {
     return new Promise((resolve, reject) => {
       Geolocation.getCurrentPosition(
         (pos) => {
@@ -35,9 +35,9 @@ export  const getCurrentLocation = async (): Promise<any> => {
 
 export const requestPermission = async (permission: Permission) => {
     const result = await request(permission);
-    console.log(result);
     if (result === RESULTS.GRANTED) {
-      getCurrentLocation();
+      const coords: Coordinates = await getCurrentLocation();
+      return coords;
     }
     else{
       Alert.alert('Разрешение заблокировано',
