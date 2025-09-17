@@ -26,25 +26,46 @@ interface listItem {
 }
 
 interface State {
-  currentItem: object;
+  currentItem: listItem;
   list: listItem[];
   isLoading: boolean;
 }
 
 const initialState: State = {
   list: [],
-  currentItem: {},
+  currentItem: {
+    id: '',
+    logo: '',
+    address: '',
+    companyName: '',
+    dateStartByCity: '',
+    timeStartByCity: '',
+    timeEndByCity: '',
+    currentWorkers: '',
+    planWorkers: '',
+    workTypes: [],
+    priceWorker: '',
+    customerFeedbacksCount: '',
+    customerRating: '',
+  },
   isLoading: false,
 };
 
 const listSlice = createSlice({
   name: 'list',
   initialState,
-  reducers: {},
+  reducers: {
+    getCurrentItem: (state, action) => {
+      const { id } = action.payload;
+      const currentItem = state.list.find(item => item.id === id);
+      state.currentItem = currentItem;
+      console.log('RESULT', currentItem);
+    },
+  },
   extraReducers: builder => {
     builder
-      .addCase(allData.fulfilled, (state, actions) => {
-        const data = actions.payload;
+      .addCase(allData.fulfilled, (state, action) => {
+        const data = action.payload;
         state.list = data;
         state.isLoading = false;
       })
@@ -65,4 +86,5 @@ export const allData = createAsyncThunk(
     }
   },
 );
+export const { getCurrentItem } = listSlice.actions;
 export default listSlice.reducer;
