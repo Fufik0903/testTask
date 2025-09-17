@@ -1,29 +1,6 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import { getAllData } from '../api/api';
-import { Coordinates } from '../permission/permission';
-
-interface workType {
-  id: number;
-  name: string;
-  nameGt5: string;
-  nameLt5: string;
-  nameOne: string;
-}
-interface listItem {
-  id: string;
-  logo: string;
-  address: string;
-  companyName: string;
-  dateStartByCity: string;
-  timeStartByCity: string;
-  timeEndByCity: string;
-  currentWorkers: string;
-  planWorkers: string;
-  workTypes: workType[];
-  priceWorker: string;
-  customerFeedbacksCount: string;
-  customerRating: string;
-}
+import { Coordinates, listItem } from '../interfaces';
 
 interface State {
   currentItem: listItem;
@@ -58,8 +35,7 @@ const listSlice = createSlice({
     getCurrentItem: (state, action) => {
       const { id } = action.payload;
       const currentItem = state.list.find(item => item.id === id);
-      state.currentItem = currentItem;
-      console.log('RESULT', currentItem);
+      if (currentItem) state.currentItem = currentItem;
     },
   },
   extraReducers: builder => {
@@ -81,8 +57,16 @@ export const allData = createAsyncThunk(
       const { latitude, longitude } = coords;
       const response = await getAllData(latitude, longitude);
       return response.data.data;
-    } catch (error) {
-      return thunkAPI.rejectWithValue(error.message);
+    } catch (error: unknown) {
+      let errorMessage = 'Unknown error';
+
+      if (error instanceof Error) {
+        errorMessage = error.message;
+      } else if (typeof error === 'string') {
+        errorMessage = error;
+      }
+
+      return thunkAPI.rejectWithValue(errorMessage);
     }
   },
 );

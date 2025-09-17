@@ -2,9 +2,9 @@ import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
 import { useSelector } from 'react-redux';
 import { RootState } from '../redux/store';
-import { workType } from './List';
+import { workType } from '../interfaces';
 
-const ListItem = ({}) => {
+const ListItem = () => {
   const {
     currentItem: {
       companyName,
@@ -14,9 +14,11 @@ const ListItem = ({}) => {
       dateStartByCity,
       timeStartByCity,
       timeEndByCity,
+      currentWorkers,
       customerRating,
       customerFeedbacksCount,
       priceWorker,
+      planWorkers,
     },
   } = useSelector((state: RootState) => state.list);
   return (
@@ -37,7 +39,9 @@ const ListItem = ({}) => {
           <Text style={styles.text}>
             Время окончания смены: {timeEndByCity}
           </Text>
-          <Text style={styles.text}>Стоимость услуг: {priceWorker}</Text>
+          <Text style={styles.text}>
+            Сумма выплаты за смену (в рублях): {priceWorker}
+          </Text>
         </View>
         <View style={styles.content}>
           <Text style={styles.text}>
@@ -45,7 +49,15 @@ const ListItem = ({}) => {
               ? `Рейтинг нанимателя: ${customerRating}`
               : 'У этого нанимателя еще нет рейтинга'}
           </Text>
-          <Text style={styles.text}>Отзывы: {customerFeedbacksCount}</Text>
+          <Text style={styles.text}>
+            Количество отзывов о клиенте: {customerFeedbacksCount}
+          </Text>
+          <Text style={styles.text}>
+            Сколько людей уже набрано: {currentWorkers}
+          </Text>
+          <Text style={styles.text}>
+            Сколько людей требуется: {planWorkers}
+          </Text>
         </View>
       </View>
       <View />
@@ -84,7 +96,7 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   text: {
-    fontSize: 18,
+    fontSize: 16,
   },
 });
 export default ListItem;

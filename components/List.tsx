@@ -9,13 +9,20 @@ import {
 import { useSelector } from 'react-redux';
 import { RootState, useAppDispatch } from '../redux/store';
 import { getCurrentItem } from '../redux/listSlice';
-export interface workType {
-  name: string;
-}
-const List = ({ navigation }) => {
+import { listItem, workType } from '../interfaces';
+
+import type { NativeStackScreenProps } from '@react-navigation/native-stack';
+type RootStackParamList = {
+  List: undefined;
+  Detail: { item: listItem };
+};
+
+type Props = NativeStackScreenProps<RootStackParamList, 'List'>;
+
+const List = ({ navigation }: Props) => {
   const { list, isLoading } = useSelector((state: RootState) => state.list);
   const dispatch = useAppDispatch();
-  const showCurrentItem = item => {
+  const showCurrentItem = (item: listItem) => {
     dispatch(getCurrentItem({ id: item.id }));
     navigation.navigate('Detail', { item });
   };
