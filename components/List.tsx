@@ -12,6 +12,7 @@ import { getCurrentItem } from '../redux/listSlice';
 import { listItem, workType } from '../interfaces';
 
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
+import { Skeleton } from './Skeleton';
 type RootStackParamList = {
   List: undefined;
   Detail: { item: listItem };
@@ -26,12 +27,15 @@ const List = ({ navigation }: Props) => {
     dispatch(getCurrentItem({ id: item.id }));
     navigation.navigate('Detail', { item });
   };
+  const mockArray = Array(10).fill(0);
   return (
     <View>
       {isLoading ? (
-        <View>
-          <Text>Loading</Text>
-        </View>
+        <FlatList
+          data={mockArray}
+          keyExtractor={(item, index) => index.toString()}
+          renderItem={() => <Skeleton />}
+        />
       ) : (
         <FlatList
           data={list}
